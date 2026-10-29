@@ -13,11 +13,12 @@ const footerColumns = [
     ],
   },
   {
-    title: 'Conferences',
+    title: 'Publishing',
     links: [
-      { label: 'Upcoming Conferences', to: '/conferences' },
-      { label: 'Submit Abstract', to: '/conferences/submit' },
-      { label: 'Conference Proceedings', to: '/conferences' },
+      { label: 'Peer Review Process', to: '/peer-review' },
+      { label: 'Index & Abstracting', to: '/indexing' },
+      { label: 'Author Guidelines', to: '/pages/author-guidelines' },
+      { label: 'Publication Charges', to: '/pages/publication-charges' },
     ],
   },
   {
@@ -34,10 +35,9 @@ const footerColumns = [
     title: 'Company',
     links: [
       { label: 'About Us', to: '/pages/about' },
-      { label: 'News', to: '/news' },
-      { label: 'Books', to: '/books' },
       { label: 'Contact', to: '/contact' },
       { label: 'FAQ', to: '/pages/faq' },
+      { label: 'Sitemap', to: '/sitemap' },
     ],
   },
 ];

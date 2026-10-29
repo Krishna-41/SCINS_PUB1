@@ -1,19 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Menu,
   X,
   Search,
   ChevronDown,
   BookOpen,
-  Mic,
-  FileText,
   Info,
   LayoutGrid,
   Phone,
+  FileText,
+  ShieldCheck,
+  Library,
+  Users,
+  ListOrdered,
 } from 'lucide-react';
 import { useSiteSettings } from '@/lib/useSiteSettings';
 import { useAuth } from '@/lib/auth';
+
+export type NavVariant = 'home' | 'general' | 'journal' | 'submit' | 'peer-review';
 
 interface NavItem {
   label: string;
@@ -22,37 +27,14 @@ interface NavItem {
   icon?: typeof BookOpen;
 }
 
-const navItems: NavItem[] = [
+const homeNav: NavItem[] = [
   { label: 'Home', to: '/', icon: LayoutGrid },
-  {
-    label: 'Journals',
-    to: '/journals',
-    icon: BookOpen,
-    children: [
-      { label: 'All Journals', to: '/journals' },
-      { label: 'Journal Categories', to: '/categories' },
-      { label: 'Latest Articles', to: '/articles' },
-    ],
-  },
-  {
-    label: 'Conferences',
-    to: '/conferences',
-    icon: Mic,
-    children: [
-      { label: 'Upcoming Conferences', to: '/conferences' },
-      { label: 'Submit Abstract', to: '/conferences/submit' },
-    ],
-  },
-  {
-    label: 'Publish',
-    to: '/submit',
-    icon: FileText,
-    children: [
-      { label: 'Submit Manuscript', to: '/submit' },
-      { label: 'Author Guidelines', to: '/pages/author-guidelines' },
-      { label: 'Publication Charges', to: '/pages/publication-charges' },
-    ],
-  },
+  { label: 'Journals', to: '/journals', icon: BookOpen },
+  { label: 'Articles', to: '/articles', icon: FileText },
+  { label: 'Categories', to: '/categories', icon: ListOrdered },
+  { label: 'Submit Manuscript', to: '/submit', icon: FileText },
+  { label: 'Index & Abstracting', to: '/indexing', icon: Library },
+  { label: 'Peer Review', to: '/peer-review', icon: ShieldCheck },
   {
     label: 'About',
     to: '/pages/about',
@@ -66,25 +48,98 @@ const navItems: NavItem[] = [
       { label: 'Copyright & Licensing', to: '/pages/copyright-licensing' },
     ],
   },
-  { label: 'News', to: '/news' },
-  { label: 'Books', to: '/books' },
   { label: 'Contact', to: '/contact', icon: Phone },
 ];
 
-export function Header() {
+const generalNav: NavItem[] = [
+  { label: 'Home', to: '/', icon: LayoutGrid },
+  { label: 'Journals', to: '/journals', icon: BookOpen },
+  { label: 'Articles', to: '/articles', icon: FileText },
+  { label: 'Submit Manuscript', to: '/submit', icon: FileText },
+  { label: 'Index & Abstracting', to: '/indexing', icon: Library },
+  { label: 'Peer Review', to: '/peer-review', icon: ShieldCheck },
+  { label: 'Contact', to: '/contact', icon: Phone },
+];
+
+const journalNav: NavItem[] = [
+  { label: 'Home', to: '/', icon: LayoutGrid },
+  { label: 'Journals', to: '/journals', icon: BookOpen },
+  { label: 'Articles', to: '/articles', icon: FileText },
+  { label: 'Categories', to: '/categories', icon: ListOrdered },
+  { label: 'Submit Manuscript', to: '/submit', icon: FileText },
+  { label: 'Peer Review', to: '/peer-review', icon: ShieldCheck },
+  { label: 'Contact', to: '/contact', icon: Phone },
+];
+
+const submitNav: NavItem[] = [
+  { label: 'Home', to: '/', icon: LayoutGrid },
+  { label: 'Journals', to: '/journals', icon: BookOpen },
+  { label: 'Index & Abstracting', to: '/indexing', icon: Library },
+  { label: 'Peer Review', to: '/peer-review', icon: ShieldCheck },
+  { label: 'Author Guidelines', to: '/pages/author-guidelines', icon: FileText },
+  { label: 'Contact', to: '/contact', icon: Phone },
+];
+
+const peerReviewNav: NavItem[] = [
+  { label: 'Home', to: '/', icon: LayoutGrid },
+  { label: 'Journals', to: '/journals', icon: BookOpen },
+  { label: 'Submit Manuscript', to: '/submit', icon: FileText },
+  { label: 'Index & Abstracting', to: '/indexing', icon: Library },
+  { label: 'Publication Ethics', to: '/pages/publication-ethics', icon: ShieldCheck },
+  { label: 'Contact', to: '/contact', icon: Phone },
+];
+
+function navForVariant(variant: NavVariant): NavItem[] {
+  switch (variant) {
+    case 'home':
+      return homeNav;
+    case 'journal':
+      return journalNav;
+    case 'submit':
+      return submitNav;
+    case 'peer-review':
+      return peerReviewNav;
+    case 'general':
+    default:
+      return generalNav;
+  }
+}
+
+function deriveVariant(pathname: string): NavVariant {
+  if (pathname === '/') return 'home';
+  if (pathname.startsWith('/journals') || pathname.startsWith('/articles') || pathname.startsWith('/categories'))
+    return 'journal';
+  if (pathname.startsWith('/submit')) return 'submit';
+  if (pathname.startsWith('/peer-review')) return 'peer-review';
+  return 'general';
+}
+
+interface HeaderProps {
+  variant?: NavVariant;
+}
+
+export function Header({ variant }: HeaderProps) {
   const { settings } = useSiteSettings();
   const { profile } = useAuth();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
 
+  const resolvedVariant = variant ?? deriveVariant(location.pathname);
+  const navItems = navForVariant(resolvedVariant);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +151,8 @@ export function Header() {
 
   const announcementActive = settings.announcement_bar_active === 'true';
   const announcementText = settings.announcement_bar;
+
+  const isHome = resolvedVariant === 'home';
 
   return (
     <header className="sticky top-0 z-40">

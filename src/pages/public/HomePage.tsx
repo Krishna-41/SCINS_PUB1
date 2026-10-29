@@ -1,33 +1,34 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  BookOpen,
-  FileText,
-  Users,
-  Globe,
-  ArrowRight,
-  Mic,
-  ShieldCheck,
-  CheckCircle2,
-  Library,
-} from 'lucide-react';
+import { BookOpen, FileText, Users, Globe, ArrowRight, ShieldCheck, CircleCheck as CheckCircle2, Library, ListOrdered } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useSiteSettings } from '@/lib/useSiteSettings';
-import type { Journal, Article, NewsItem, Conference } from '@/lib/types';
+import type { Journal, Article, EditorialBoardMember } from '@/lib/types';
 import { Card, CardBody } from '@/components/ui/Card';
 import { LoadingSpinner, EmptyState } from '@/components/ui/States';
+
+interface EditorCard {
+  id: string;
+  name: string;
+  title: string;
+  affiliation: string;
+  country: string;
+  photo_url: string;
+  board_role: string;
+  journalTitle: string;
+  journalSlug: string;
+}
 
 export function HomePage() {
   const { settings } = useSiteSettings();
   const [journals, setJournals] = useState<Journal[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [conferences, setConferences] = useState<Conference[]>([]);
+  const [editors, setEditors] = useState<EditorCard[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const [jRes, aRes, nRes, cRes] = await Promise.all([
+      const [jRes, aRes] = await Promise.all([
         supabase
           .from('journals')
           .select('*, category:journal_categories(*)')
@@ -40,28 +41,54 @@ export function HomePage() {
           .in('status', ['published', 'corrected'])
           .order('published_date', { ascending: false })
           .limit(6),
-        supabase
-          .from('news_items')
-          .select('*')
-          .eq('status', 'published')
-          .order('published_date', { ascending: false })
-          .limit(4),
-        supabase
-          .from('conferences')
-          .select('*')
-          .eq('status', 'published')
-          .order('start_date', { ascending: true })
-          .limit(3),
       ]);
       setJournals((jRes.data as unknown as Journal[]) || []);
       setArticles((aRes.data as unknown as Article[]) || []);
-      setNews((nRes.data as unknown as NewsItem[]) || []);
-      setConferences((cRes.data as unknown as Conference[]) || []);
+
+      // Fetch editors-in-chief: gather editorial board members with Editor-in-Chief role
+      // across published journals.
+      const journalList = (jRes.data as unknown as Journal[]) || [];
+      if (journalList.length > 0) {
+        const { data: boardData } = await supabase
+          .from('editorial_board_members')
+          .select('id, name, title, affiliation, country, photo_url, board_role, journal_id')
+          .in(
+            'journal_id',
+            journalList.map((j) => j.id)
+          )
+          .ilike('board_role', '%editor-in-chief%')
+          .order('sort_order', { ascending: true });
+
+        const board = (boardData as unknown as (EditorialBoardMember & { journal_id: string })[]) || [];
+        const journalMap = new Map(journalList.map((j) => [j.id, j]));
+        const editorCards: EditorCard[] = board
+          .map((b) => {
+            const j = journalMap.get(b.journal_id);
+            if (!j) return null;
+            return {
+              id: b.id,
+              name: b.name,
+              title: b.title,
+              affiliation: b.affiliation,
+              country: b.country,
+              photo_url: b.photo_url,
+              board_role: b.board_role,
+              journalTitle: j.title,
+              journalSlug: j.slug,
+            } as EditorCard;
+          })
+          .filter((c): c is EditorCard => c !== null)
+          .slice(0, 8);
+        setEditors(editorCards);
+      }
+
       setLoading(false);
     })();
   }, []);
 
   if (loading) return <LoadingSpinner label="Loading homepage..." />;
+
+  const hasArticles = articles.length > 0;
 
   return (
     <div className="animate-fade-in">
@@ -84,19 +111,25 @@ export function HomePage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
-                to={settings.hero_cta_primary_url || '/submit'}
+                to="/submit"
                 className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-medium px-6 py-3 rounded-lg transition-colors shadow-lg"
               >
                 <FileText size={18} />
-                {settings.hero_cta_primary_text || 'Submit Manuscript'}
+                Submit Manuscript
               </Link>
               <Link
-                to={settings.hero_cta_secondary_url || '/journals'}
+                to="/indexing"
                 className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium px-6 py-3 rounded-lg transition-colors backdrop-blur-sm"
               >
-                <BookOpen size={18} />
-                {settings.hero_cta_secondary_text || 'Browse Journals'}
-                <ArrowRight size={16} />
+                <Library size={18} />
+                Index &amp; Abstracting
+              </Link>
+              <Link
+                to="/peer-review"
+                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium px-6 py-3 rounded-lg transition-colors backdrop-blur-sm"
+              >
+                <ShieldCheck size={18} />
+                Peer Review
               </Link>
             </div>
           </div>
@@ -110,7 +143,7 @@ export function HomePage() {
             {[
               { icon: BookOpen, label: 'Active Journals', value: journals.length, to: '/journals' },
               { icon: FileText, label: 'Published Articles', value: articles.length, to: '/articles' },
-              { icon: Mic, label: 'Upcoming Conferences', value: conferences.length, to: '/conferences' },
+              { icon: Users, label: 'Editors-in-Chief', value: editors.length, to: '/journals' },
               { icon: Globe, label: 'Open Access', value: '100%', to: '/pages/open-access-policy' },
             ].map((stat) => (
               <Link
@@ -157,6 +190,10 @@ export function HomePage() {
                           alt={journal.title}
                           className="w-full h-40 object-cover rounded-lg mb-4"
                         />
+                      ) : journal.logo_url ? (
+                        <div className="w-full h-40 rounded-lg bg-navy-50 flex items-center justify-center mb-4">
+                          <img src={journal.logo_url} alt={journal.title} className="max-h-32 max-w-[80%] object-contain" />
+                        </div>
                       ) : (
                         <div className="w-full h-40 rounded-lg bg-gradient-to-br from-navy-100 to-teal-50 flex items-center justify-center mb-4">
                           <BookOpen className="h-12 w-12 text-navy-300" />
@@ -165,14 +202,18 @@ export function HomePage() {
                       <h3 className="text-lg font-serif font-bold text-navy-900 mb-2 line-clamp-2">
                         {journal.title}
                       </h3>
-                      <p className="text-sm text-navy-500 line-clamp-2 mb-3">
-                        {journal.description || journal.scope || 'No description available'}
-                      </p>
-                      <div className="flex items-center gap-3 text-xs text-navy-400">
+                      {(journal.description || journal.scope) && (
+                        <p className="text-sm text-navy-500 line-clamp-2 mb-3">
+                          {journal.description || journal.scope}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-3 text-xs text-navy-400 flex-wrap">
                         {journal.issn && <span>ISSN: {journal.issn}</span>}
-                        <span className="px-2 py-0.5 rounded-full bg-teal-50 text-teal-600 font-medium">
-                          {journal.publication_model}
-                        </span>
+                        {journal.publication_model && (
+                          <span className="px-2 py-0.5 rounded-full bg-teal-50 text-teal-600 font-medium">
+                            {journal.publication_model}
+                          </span>
+                        )}
                       </div>
                     </CardBody>
                   </Card>
@@ -183,8 +224,60 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* Editors-in-Chief */}
+      {editors.length > 0 && (
+        <section className="bg-navy-50 py-16 lg:py-20">
+          <div className="container-wide">
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-serif font-bold text-navy-900 mb-2">Editors-in-Chief</h2>
+                <p className="text-navy-500">Distinguished researchers leading our journals</p>
+              </div>
+              <Link to="/journals" className="text-sm text-teal-600 hover:text-teal-700 font-medium inline-flex items-center gap-1">
+                View all journals <ArrowRight size={16} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {editors.map((editor) => (
+                <Card key={editor.id} hover className="h-full">
+                  <CardBody className="text-center">
+                    {editor.photo_url ? (
+                      <img
+                        src={editor.photo_url}
+                        alt={editor.name}
+                        className="h-24 w-24 rounded-full object-cover mx-auto mb-4 border-2 border-teal-100"
+                      />
+                    ) : (
+                      <div className="h-24 w-24 rounded-full bg-gradient-to-br from-teal-100 to-navy-100 flex items-center justify-center mx-auto mb-4 border-2 border-teal-100">
+                        <Users className="h-10 w-10 text-navy-400" />
+                      </div>
+                    )}
+                    <h3 className="text-base font-serif font-bold text-navy-900">{editor.name}</h3>
+                    {editor.board_role && (
+                      <p className="text-xs text-teal-600 font-medium mt-1">{editor.board_role}</p>
+                    )}
+                    {editor.affiliation && (
+                      <p className="text-xs text-navy-500 mt-2 line-clamp-2">{editor.affiliation}</p>
+                    )}
+                    {editor.country && (
+                      <p className="text-xs text-navy-400 mt-1">{editor.country}</p>
+                    )}
+                    <Link
+                      to={`/journals/${editor.journalSlug}`}
+                      className="mt-3 inline-flex items-center gap-1 text-xs text-teal-600 hover:text-teal-700 font-medium"
+                    >
+                      {editor.journalTitle} <ArrowRight size={12} />
+                    </Link>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Publishing workflow */}
-      <section className="bg-navy-50 py-16 lg:py-20">
+      <section className="py-16 lg:py-20">
         <div className="container-wide">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-serif font-bold text-navy-900 mb-2">Our Publishing Process</h2>
@@ -215,20 +308,18 @@ export function HomePage() {
       </section>
 
       {/* Latest Articles */}
-      <section className="py-16 lg:py-20">
-        <div className="container-wide">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-serif font-bold text-navy-900 mb-2">Latest Publications</h2>
-              <p className="text-navy-500">Recently published research articles</p>
+      {hasArticles && (
+        <section className="bg-navy-50 py-16 lg:py-20">
+          <div className="container-wide">
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-serif font-bold text-navy-900 mb-2">Latest Publications</h2>
+                <p className="text-navy-500">Recently published research articles</p>
+              </div>
+              <Link to="/articles" className="text-sm text-teal-600 hover:text-teal-700 font-medium inline-flex items-center gap-1">
+                View all <ArrowRight size={16} />
+              </Link>
             </div>
-            <Link to="/articles" className="text-sm text-teal-600 hover:text-teal-700 font-medium inline-flex items-center gap-1">
-              View all <ArrowRight size={16} />
-            </Link>
-          </div>
-          {articles.length === 0 ? (
-            <EmptyState title="No articles published yet" description="Published articles will appear here." />
-          ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {articles.map((article) => (
                 <Link key={article.id} to={`/articles/${article.slug}`}>
@@ -250,9 +341,9 @@ export function HomePage() {
                       <h3 className="text-base font-serif font-bold text-navy-900 mb-2 line-clamp-2">
                         {article.title}
                       </h3>
-                      <p className="text-sm text-navy-500 line-clamp-3 mb-3">
-                        {article.abstract || 'No abstract available'}
-                      </p>
+                      {article.abstract && (
+                        <p className="text-sm text-navy-500 line-clamp-3 mb-3">{article.abstract}</p>
+                      )}
                       <div className="flex items-center gap-3 text-xs text-navy-400">
                         {article.published_date && (
                           <span>{new Date(article.published_date).toLocaleDateString()}</span>
@@ -264,95 +355,9 @@ export function HomePage() {
                 </Link>
               ))}
             </div>
-          )}
-        </div>
-      </section>
-
-      {/* Conferences + News */}
-      <section className="bg-navy-50 py-16 lg:py-20">
-        <div className="container-wide">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Conferences */}
-            <div>
-              <div className="flex items-end justify-between mb-6">
-                <h2 className="text-2xl font-serif font-bold text-navy-900">Upcoming Conferences</h2>
-                <Link to="/conferences" className="text-sm text-teal-600 hover:text-teal-700 font-medium inline-flex items-center gap-1">
-                  View all <ArrowRight size={16} />
-                </Link>
-              </div>
-              {conferences.length === 0 ? (
-                <EmptyState title="No upcoming conferences" description="New conferences will be listed here." />
-              ) : (
-                <div className="space-y-4">
-                  {conferences.map((conf) => (
-                    <Link key={conf.id} to={`/conferences/${conf.slug}`}>
-                      <Card hover>
-                        <CardBody className="flex items-start gap-4">
-                          {conf.logo_url ? (
-                            <img src={conf.logo_url} alt={conf.name} className="h-16 w-16 rounded-lg object-cover flex-shrink-0" />
-                          ) : (
-                            <div className="h-16 w-16 rounded-lg bg-teal-50 flex items-center justify-center flex-shrink-0">
-                              <Mic className="h-7 w-7 text-teal-500" />
-                            </div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-base font-serif font-bold text-navy-900 mb-1">{conf.name}</h3>
-                            <p className="text-sm text-navy-500 line-clamp-2 mb-2">{conf.theme || conf.description}</p>
-                            <div className="flex items-center gap-3 text-xs text-navy-400">
-                              {conf.start_date && (
-                                <span>{new Date(conf.start_date).toLocaleDateString()}</span>
-                              )}
-                              {conf.city && <span>{conf.city}, {conf.country}</span>}
-                            </div>
-                          </div>
-                        </CardBody>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* News */}
-            <div>
-              <div className="flex items-end justify-between mb-6">
-                <h2 className="text-2xl font-serif font-bold text-navy-900">News & Announcements</h2>
-                <Link to="/news" className="text-sm text-teal-600 hover:text-teal-700 font-medium inline-flex items-center gap-1">
-                  View all <ArrowRight size={16} />
-                </Link>
-              </div>
-              {news.length === 0 ? (
-                <EmptyState title="No news published yet" description="News and announcements will appear here." />
-              ) : (
-                <div className="space-y-4">
-                  {news.map((item) => (
-                    <Link key={item.id} to={`/news/${item.slug}`}>
-                      <Card hover>
-                        <CardBody>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-xs font-medium text-teal-600 uppercase tracking-wide">
-                              {item.news_type.replace(/_/g, ' ')}
-                            </span>
-                            {item.published_date && (
-                              <span className="text-xs text-navy-400">
-                                {new Date(item.published_date).toLocaleDateString()}
-                              </span>
-                            )}
-                          </div>
-                          <h3 className="text-base font-serif font-bold text-navy-900 mb-1 line-clamp-2">
-                            {item.title}
-                          </h3>
-                          <p className="text-sm text-navy-500 line-clamp-2">{item.excerpt}</p>
-                        </CardBody>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="py-16 lg:py-20">
@@ -375,11 +380,11 @@ export function HomePage() {
                 Submit Manuscript
               </Link>
               <Link
-                to="/pages/author-guidelines"
+                to="/peer-review"
                 className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium px-6 py-3 rounded-lg transition-colors"
               >
-                Author Guidelines
-                <ArrowRight size={16} />
+                <ShieldCheck size={18} />
+                Peer Review Process
               </Link>
             </div>
           </div>
