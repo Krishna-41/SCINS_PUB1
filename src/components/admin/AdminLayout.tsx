@@ -4,9 +4,6 @@ import {
   LayoutDashboard,
   BookOpen,
   FileText,
-  Newspaper,
-  Mic,
-  Book,
   Settings,
   Users,
   MessageSquare,
@@ -41,19 +38,11 @@ const navSections: NavSection[] = [
       { to: '/admin/articles', label: 'Articles', icon: FileText },
       { to: '/admin/issues', label: 'Issues', icon: Library },
       { to: '/admin/categories', label: 'Categories', icon: FolderTree },
-      { to: '/admin/books', label: 'Books', icon: Book },
-    ],
-  },
-  {
-    label: 'Events',
-    items: [
-      { to: '/admin/conferences', label: 'Conferences', icon: Mic },
     ],
   },
   {
     label: 'Content',
     items: [
-      { to: '/admin/news', label: 'News', icon: Newspaper },
       { to: '/admin/pages', label: 'CMS Pages', icon: FileText },
       { to: '/admin/media', label: 'Media Library', icon: ImageIcon },
     ],

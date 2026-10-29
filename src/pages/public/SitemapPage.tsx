@@ -7,27 +7,22 @@ const sections: { title: string; links: { to: string; label: string }[] }[] = [
       { to: '/journals', label: 'Journals' },
       { to: '/categories', label: 'Subject categories' },
       { to: '/articles', label: 'Articles' },
-      { to: '/books', label: 'Books' },
       { to: '/search', label: 'Search' },
     ],
   },
   {
-    title: 'Authors',
+    title: 'Authors & Review',
     links: [
       { to: '/submit', label: 'Submit a manuscript' },
+      { to: '/peer-review', label: 'Peer review process' },
+      { to: '/indexing', label: 'Index & abstracting' },
       { to: '/pages/author-guidelines', label: 'Author guidelines' },
-    ],
-  },
-  {
-    title: 'Events & news',
-    links: [
-      { to: '/conferences', label: 'Conferences' },
-      { to: '/news', label: 'News & announcements' },
     ],
   },
   {
     title: 'About',
     links: [
+      { to: '/pages/about', label: 'About SCINS MEDIA' },
       { to: '/contact', label: 'Contact us' },
       { to: '/pages/privacy-policy', label: 'Privacy policy' },
       { to: '/pages/terms-conditions', label: 'Terms & conditions' },

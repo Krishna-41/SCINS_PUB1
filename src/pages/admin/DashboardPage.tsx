@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, FileText, Mic, Newspaper, Users, Mail, MessageSquare, ClipboardList, type LucideIcon } from 'lucide-react';
+import { BookOpen, FileText, Users, Mail, MessageSquare, ClipboardList, type LucideIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth';
 import { PageHeader } from '@/components/admin/PageHeader';
@@ -23,8 +23,6 @@ const stats: Stat[] = [
   { label: 'Journals', table: 'journals', to: '/admin/journals', icon: BookOpen, tone: 'bg-teal-100 text-teal-700' },
   { label: 'Articles', table: 'articles', to: '/admin/articles', icon: FileText, tone: 'bg-accent-100 text-accent-700' },
   { label: 'Under review', table: 'articles', to: '/admin/articles', icon: ClipboardList, filter: ['status', 'under_review'], tone: 'bg-warning-100 text-warning-700' },
-  { label: 'Conferences', table: 'conferences', to: '/admin/conferences', icon: Mic, tone: 'bg-navy-100 text-navy-700' },
-  { label: 'News items', table: 'news_items', to: '/admin/news', icon: Newspaper, tone: 'bg-success-100 text-success-700' },
   { label: 'Users', table: 'profiles', to: '/admin/users', icon: Users, tone: 'bg-teal-100 text-teal-700' },
   { label: 'Unread messages', table: 'contact_messages', to: '/admin/contact', icon: MessageSquare, filter: ['status', 'unread'], tone: 'bg-error-100 text-error-700' },
   { label: 'Subscribers', table: 'newsletter_subscribers', to: '/admin/newsletter', icon: Mail, tone: 'bg-accent-100 text-accent-700' },
