@@ -41,8 +41,8 @@ const stages: Stage[] = [
     description: 'Independent, qualified experts in the subject matter are selected to review the manuscript.',
     details: [
       'Reviewers are chosen based on subject-matter expertise and absence of conflicts of interest.',
-      'A double-blind model keeps both author and reviewer identities confidential.',
-      'Reviewers are invited and given a defined timeframe to complete their assessment.',
+      'The review model for each journal is shown on its journal page.',
+      'Reviewers are invited to complete their assessment of the manuscript.',
     ],
   },
   {
@@ -112,11 +112,11 @@ const authorGuidance = [
 const faqs = [
   {
     q: 'What review model does SCINS MEDIA follow?',
-    a: 'SCINS MEDIA journals generally follow a double-blind peer review model, where the identities of both authors and reviewers remain confidential throughout the process. The specific model per journal is listed on each journal page.',
+    a: 'The review model is listed on each journal page. Timelines depend on the journal and on reviewer availability, and editors keep authors informed at each stage.',
   },
   {
     q: 'How long does the peer review process take?',
-    a: 'The timeline varies by journal and reviewer availability. After editorial screening, the peer review stage typically takes several weeks. Authors are kept informed at each stage of the process.',
+    a: 'Timelines depend on the journal and on reviewer availability. Editors keep authors informed at each stage of the process.',
   },
   {
     q: 'What are the possible editorial decisions?',

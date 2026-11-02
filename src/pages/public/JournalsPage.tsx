@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { Journal, JournalCategory } from '@/lib/types';
 import { Card, CardBody } from '@/components/ui/Card';
@@ -101,23 +101,21 @@ export function JournalsPage() {
                 <Link key={journal.id} to={`/journals/${journal.slug}`}>
                   <Card hover className="h-full">
                     <CardBody>
-                      {journal.cover_image_url ? (
+                      {journal.cover_image_url && (
                         <img
                           src={journal.cover_image_url}
                           alt={journal.title}
-                          className="w-full h-40 object-cover rounded-lg mb-4"
+                          className="w-full aspect-[4/3] object-cover rounded-lg mb-4"
                         />
-                      ) : (
-                        <div className="w-full h-40 rounded-lg bg-gradient-to-br from-navy-100 to-teal-50 flex items-center justify-center mb-4">
-                          <BookOpen className="h-12 w-12 text-navy-300" />
-                        </div>
                       )}
                       <h3 className="text-lg font-serif font-bold text-navy-900 mb-2 line-clamp-2">
                         {journal.title}
                       </h3>
-                      <p className="text-sm text-navy-500 line-clamp-2 mb-3">
-                        {journal.description || journal.scope || 'View journal for full scope and aims.'}
-                      </p>
+                      {(journal.description || journal.scope) && (
+                        <p className="text-sm text-navy-500 line-clamp-2 mb-3">
+                          {journal.description || journal.scope}
+                        </p>
+                      )}
                       <div className="flex items-center gap-2 flex-wrap text-xs">
                         {journal.category && (
                           <span className="px-2 py-0.5 rounded-full bg-navy-50 text-navy-600 font-medium">

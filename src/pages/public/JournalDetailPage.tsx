@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { BookOpen, FileText, Users, Mail, Calendar, ArrowRight, ExternalLink } from 'lucide-react';
+import { FileText, Users, Calendar } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { Journal, Article, Issue, EditorialBoardMember } from '@/lib/types';
 import { Card, CardBody } from '@/components/ui/Card';
@@ -77,6 +77,8 @@ export function JournalDetailPage() {
     );
   }
 
+  const accent = /^#[0-9a-fA-F]{6}$/.test(journal.seo_title) ? journal.seo_title : null;
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'overview', label: 'Overview' },
     { key: 'articles', label: 'Articles' },
@@ -88,8 +90,12 @@ export function JournalDetailPage() {
   return (
     <div className="animate-fade-in">
       {/* Header */}
-      <div className="bg-gradient-to-br from-navy-900 to-navy-800 text-white">
-        <div className="container-wide py-12">
+      <div className="relative overflow-hidden bg-gradient-to-br from-navy-900 to-navy-800 text-white">
+        {journal.banner_url && (
+          <img src={journal.banner_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
+        )}
+        {accent && <div className="absolute inset-x-0 top-0 h-1.5" style={{ backgroundColor: accent }} />}
+        <div className="container-wide relative py-12">
           <div className="flex flex-col md:flex-row gap-6">
             {journal.cover_image_url ? (
               <img
@@ -97,11 +103,7 @@ export function JournalDetailPage() {
                 alt={journal.title}
                 className="w-32 h-44 object-cover rounded-lg shadow-lg flex-shrink-0"
               />
-            ) : (
-              <div className="w-32 h-44 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                <BookOpen className="h-12 w-12 text-teal-400" />
-              </div>
-            )}
+            ) : null}
             <div className="flex-1">
               {journal.category && (
                 <Link
@@ -140,7 +142,7 @@ export function JournalDetailPage() {
         <div className="container-wide">
           <nav className="flex gap-1 overflow-x-auto">
             {tabs.map((t) => {
-              const hex = journal.seo_title || '';
+              const hex = accent ?? '';
               const isActive = tab === t.key;
               const borderStyle = isActive && hex
                 ? { borderBottomColor: hex, color: hex }
@@ -169,10 +171,12 @@ export function JournalDetailPage() {
       <div className="container-wide py-8">
         {tab === 'overview' && (
           <div className="max-w-4xl space-y-6">
-            <div>
-              <h2 className="text-xl font-serif font-bold text-navy-900 mb-3">Aims & Scope</h2>
-              <p className="text-navy-700 leading-relaxed">{journal.description || 'No description available.'}</p>
-            </div>
+            {journal.description && (
+              <div>
+                <h2 className="text-xl font-serif font-bold text-navy-900 mb-3">Aims & Scope</h2>
+                <p className="text-navy-700 leading-relaxed">{journal.description}</p>
+              </div>
+            )}
             {journal.scope && (
               <div>
                 <h2 className="text-xl font-serif font-bold text-navy-900 mb-3">Scope</h2>

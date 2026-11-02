@@ -36,9 +36,6 @@ import { JournalsAdmin } from '@/pages/admin/JournalsAdmin';
 import { ArticlesAdmin } from '@/pages/admin/ArticlesAdmin';
 import { IssuesAdmin } from '@/pages/admin/IssuesAdmin';
 import { CategoriesAdmin } from '@/pages/admin/CategoriesAdmin';
-import { ConferencesAdmin } from '@/pages/admin/ConferencesAdmin';
-import { NewsAdmin } from '@/pages/admin/NewsAdmin';
-import { BooksAdmin } from '@/pages/admin/BooksAdmin';
 import { CmsPagesAdmin } from '@/pages/admin/CmsPagesAdmin';
 import { MediaAdmin } from '@/pages/admin/MediaAdmin';
 import { MessagesAdmin } from '@/pages/admin/MessagesAdmin';
@@ -122,9 +119,6 @@ function App() {
               <Route path="articles" element={<ArticlesAdmin />} />
               <Route path="issues" element={<IssuesAdmin />} />
               <Route path="categories" element={<CategoriesAdmin />} />
-              <Route path="books" element={<BooksAdmin />} />
-              <Route path="conferences" element={<ConferencesAdmin />} />
-              <Route path="news" element={<NewsAdmin />} />
               <Route path="pages" element={<CmsPagesAdmin />} />
               <Route path="media" element={<MediaAdmin />} />
               <Route path="contact" element={<MessagesAdmin />} />

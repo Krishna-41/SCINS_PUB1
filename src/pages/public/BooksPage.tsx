@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Download, ExternalLink } from 'lucide-react';
+import { Download, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { Book } from '@/lib/types';
 import { Card, CardBody } from '@/components/ui/Card';
@@ -42,12 +42,8 @@ export function BooksPage() {
             {books.map((book) => (
               <Card key={book.id} hover className="h-full">
                 <CardBody>
-                  {book.cover_url ? (
+                  {book.cover_url && (
                     <img src={book.cover_url} alt={book.title} className="w-full h-56 object-cover rounded-lg mb-4 shadow-md" />
-                  ) : (
-                    <div className="w-full h-56 rounded-lg bg-gradient-to-br from-navy-100 to-teal-50 flex items-center justify-center mb-4">
-                      <BookOpen className="h-12 w-12 text-navy-300" />
-                    </div>
                   )}
                   <h3 className="text-base font-serif font-bold text-navy-900 mb-1 line-clamp-2">{book.title}</h3>
                   {book.subtitle && <p className="text-sm text-navy-400 line-clamp-1 mb-2">{book.subtitle}</p>}

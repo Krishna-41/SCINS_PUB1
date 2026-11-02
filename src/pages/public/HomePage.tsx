@@ -188,17 +188,13 @@ export function HomePage() {
                         <img
                           src={journal.cover_image_url}
                           alt={journal.title}
-                          className="w-full h-40 object-cover rounded-lg mb-4"
+                          className="w-full aspect-[4/3] object-cover rounded-lg mb-4"
                         />
                       ) : journal.logo_url ? (
-                        <div className="w-full h-40 rounded-lg bg-navy-50 flex items-center justify-center mb-4">
+                        <div className="w-full aspect-[4/3] rounded-lg bg-navy-50 flex items-center justify-center mb-4">
                           <img src={journal.logo_url} alt={journal.title} className="max-h-32 max-w-[80%] object-contain" />
                         </div>
-                      ) : (
-                        <div className="w-full h-40 rounded-lg bg-gradient-to-br from-navy-100 to-teal-50 flex items-center justify-center mb-4">
-                          <BookOpen className="h-12 w-12 text-navy-300" />
-                        </div>
-                      )}
+                      ) : null}
                       <h3 className="text-lg font-serif font-bold text-navy-900 mb-2 line-clamp-2">
                         {journal.title}
                       </h3>
@@ -241,16 +237,12 @@ export function HomePage() {
               {editors.map((editor) => (
                 <Card key={editor.id} hover className="h-full">
                   <CardBody className="text-center">
-                    {editor.photo_url ? (
+                    {editor.photo_url && (
                       <img
                         src={editor.photo_url}
                         alt={editor.name}
                         className="h-24 w-24 rounded-full object-cover mx-auto mb-4 border-2 border-teal-100"
                       />
-                    ) : (
-                      <div className="h-24 w-24 rounded-full bg-gradient-to-br from-teal-100 to-navy-100 flex items-center justify-center mx-auto mb-4 border-2 border-teal-100">
-                        <Users className="h-10 w-10 text-navy-400" />
-                      </div>
                     )}
                     <h3 className="text-base font-serif font-bold text-navy-900">{editor.name}</h3>
                     {editor.board_role && (
