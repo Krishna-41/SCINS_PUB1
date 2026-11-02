@@ -13,7 +13,8 @@ export type FieldType =
   | 'file'
   | 'relation'
   | 'url'
-  | 'email';
+  | 'email'
+  | 'color';
 
 export interface Field {
   name: string;
@@ -162,6 +163,40 @@ export function FieldInput({ field, value, onChange, relationOptions }: FieldInp
             value={url}
             onChange={(e) => onChange(e.target.value)}
           />
+        </div>
+      );
+    }
+    case 'color': {
+      const hex = (value as string) ?? '';
+      return (
+        <div>
+          <label className="block text-sm font-medium text-navy-700 mb-1.5">{field.label}</label>
+          <div className="flex items-center gap-3">
+            <div className="relative flex-shrink-0">
+              <input
+                type="color"
+                value={hex || '#0d7a6f'}
+                onChange={(e) => onChange(e.target.value)}
+                className="h-10 w-14 cursor-pointer rounded-lg border border-navy-200 bg-white p-1 focus:border-teal-400 focus:ring-2 focus:ring-teal-200 focus:outline-none"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={hex}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder="#0d7a6f"
+                className="w-28 rounded-lg border border-navy-200 px-3 py-2 text-sm font-mono focus:border-teal-400 focus:ring-2 focus:ring-teal-200 focus:outline-none"
+              />
+              {hex && (
+                <span
+                  className="h-6 w-6 rounded-md border border-navy-200"
+                  style={{ backgroundColor: hex }}
+                />
+              )}
+            </div>
+          </div>
+          {field.hint && <p className="text-xs text-navy-400 mt-1">{field.hint}</p>}
         </div>
       );
     }

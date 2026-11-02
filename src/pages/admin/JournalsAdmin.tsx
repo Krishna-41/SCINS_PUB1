@@ -42,7 +42,7 @@ const fields: Field[] = [
   { name: 'logo_url', label: 'Logo', type: 'image', folder: 'journals/logos' },
   { name: 'banner_url', label: 'Banner', type: 'image', folder: 'journals/banners' },
   { name: 'sort_order', label: 'Sort order', type: 'number', half: true },
-  { name: 'seo_title', label: 'SEO title', type: 'text' },
+  { name: 'seo_title', label: 'Menu bar color', type: 'color', hint: 'Applied to the navigation tabs on this journal\u2019s public page' },
   { name: 'seo_description', label: 'SEO description', type: 'textarea', rows: 2 },
 ];
 

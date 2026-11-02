@@ -139,19 +139,29 @@ export function JournalDetailPage() {
       <div className="border-b border-navy-100 bg-white sticky top-16 z-30">
         <div className="container-wide">
           <nav className="flex gap-1 overflow-x-auto">
-            {tabs.map((t) => (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                  tab === t.key
-                    ? 'border-teal-600 text-teal-600'
-                    : 'border-transparent text-navy-500 hover:text-navy-700'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
+            {tabs.map((t) => {
+              const hex = journal.seo_title || '';
+              const isActive = tab === t.key;
+              const borderStyle = isActive && hex
+                ? { borderBottomColor: hex, color: hex }
+                : isActive
+                  ? { borderBottomColor: '#0d7a6f', color: '#0d7a6f' }
+                  : undefined;
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key)}
+                  style={borderStyle}
+                  className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                    isActive
+                      ? hex ? '' : 'border-teal-600 text-teal-600'
+                      : 'border-transparent text-navy-500 hover:text-navy-700'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
           </nav>
         </div>
       </div>
