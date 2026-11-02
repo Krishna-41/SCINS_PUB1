@@ -49,7 +49,7 @@ const fields: Field[] = [
 const boardFields: Field[] = [
   { name: 'name', label: 'Name', type: 'text', required: true, half: true },
   { name: 'title', label: 'Title', type: 'text', half: true, hint: 'e.g. Prof. Dr.' },
-  { name: 'board_role', label: 'Role', type: 'text', half: true, hint: 'e.g. Associate Editor' },
+  { name: 'board_role', label: 'Role', type: 'text', half: true, hint: 'e.g. Editor-in-Chief or Associate Editor. Editor-in-Chief entries appear on the homepage' },
   { name: 'affiliation', label: 'Affiliation', type: 'text', half: true },
   { name: 'country', label: 'Country', type: 'text', half: true },
   { name: 'email', label: 'Email', type: 'email', half: true },

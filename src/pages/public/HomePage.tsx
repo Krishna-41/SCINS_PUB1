@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, FileText, Users, Globe, ArrowRight, ShieldCheck, CircleCheck as CheckCircle2, Library, ListOrdered } from 'lucide-react';
+import { BookOpen, FileText, Users, Globe, ArrowRight, ShieldCheck, Library } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useSiteSettings } from '@/lib/useSiteSettings';
 import type { Journal, Article, EditorialBoardMember } from '@/lib/types';
@@ -267,37 +267,6 @@ export function HomePage() {
           </div>
         </section>
       )}
-
-      {/* Publishing workflow */}
-      <section className="py-16 lg:py-20">
-        <div className="container-wide">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-serif font-bold text-navy-900 mb-2">Our Publishing Process</h2>
-            <p className="text-navy-500 max-w-2xl mx-auto">
-              A rigorous, transparent workflow ensuring the highest scientific standards
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[
-              { icon: FileText, title: 'Submit', desc: 'Authors submit manuscripts through our online system with metadata and files.' },
-              { icon: Users, title: 'Peer Review', desc: 'Expert reviewers evaluate the manuscript through a structured review process.' },
-              { icon: ShieldCheck, title: 'Decision', desc: 'Editors make publication decisions based on reviewer recommendations.' },
-              { icon: Globe, title: 'Publish', desc: 'Accepted articles are published as open access with immediate availability.' },
-            ].map((step, i) => (
-              <div key={step.title} className="relative">
-                <div className="bg-white rounded-xl border border-navy-100 p-6 text-center">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-teal-600 text-white mx-auto mb-4">
-                    <step.icon size={26} />
-                  </div>
-                  <div className="text-xs font-bold text-teal-600 mb-1">STEP {i + 1}</div>
-                  <h3 className="text-lg font-serif font-bold text-navy-900 mb-2">{step.title}</h3>
-                  <p className="text-sm text-navy-500">{step.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Latest Articles */}
       {hasArticles && (

@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, CheckCircle2, ArrowRight, Info } from 'lucide-react';
+import { FileText, CheckCircle2, ArrowRight, Info, UploadCloud, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input, Textarea, Select } from '@/components/ui/Input';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
+const ABSTRACT_MAX_MB = 10;
+const ABSTRACT_PATTERN = /\.(pdf|docx?)$/i;
+
 export function SubmitPage() {
   const [step, setStep] = useState(1);
   const [success, setSuccess] = useState(false);
   const [refNum, setRefNum] = useState('');
+  const [abstractFile, setAbstractFile] = useState<File | null>(null);
+  const [abstractError, setAbstractError] = useState('');
 
   const steps = [
     { num: 1, label: 'Manuscript Info' },
@@ -17,6 +22,22 @@ export function SubmitPage() {
     { num: 3, label: 'Declarations' },
     { num: 4, label: 'Review & Submit' },
   ];
+
+  const handleAbstractSelect = (file: File | undefined) => {
+    if (!file) return;
+    if (!ABSTRACT_PATTERN.test(file.name)) {
+      setAbstractFile(null);
+      setAbstractError('Please choose a PDF or Word document.');
+      return;
+    }
+    if (file.size > ABSTRACT_MAX_MB * 1024 * 1024) {
+      setAbstractFile(null);
+      setAbstractError(`The file must be ${ABSTRACT_MAX_MB}MB or smaller.`);
+      return;
+    }
+    setAbstractError('');
+    setAbstractFile(file);
+  };
 
   if (success) {
     return (
@@ -78,10 +99,41 @@ export function SubmitPage() {
                   <option>Letter to Editor</option>
                 </Select>
                 <Input label="Manuscript Title" placeholder="Enter the full title of your manuscript" required />
-                <Textarea label="Abstract" placeholder="Paste your abstract here..." required />
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-navy-700">Abstract (PDF or Word document)</p>
+                  {abstractFile ? (
+                    <div className="flex items-center gap-3 rounded-lg border border-navy-100 bg-navy-50/50 p-3">
+                      <FileText className="h-5 w-5 text-navy-400 flex-shrink-0" />
+                      <span className="text-sm text-navy-700 flex-1 truncate">{abstractFile.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => setAbstractFile(null)}
+                        className="text-navy-400 hover:text-error-500"
+                        aria-label="Remove abstract file"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-navy-200 hover:border-teal-300 hover:bg-navy-50/50 p-8 cursor-pointer transition-all">
+                      <UploadCloud className="h-8 w-8 text-navy-300" />
+                      <span className="text-sm text-navy-500">
+                        Choose your abstract <span className="text-teal-600 font-medium">to upload</span>
+                      </span>
+                      <span className="text-xs text-navy-400">PDF, DOC or DOCX, up to {ABSTRACT_MAX_MB}MB</span>
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        className="sr-only"
+                        onChange={(e) => handleAbstractSelect(e.target.files?.[0])}
+                      />
+                    </label>
+                  )}
+                  {abstractError && <p className="text-xs text-error-600">{abstractError}</p>}
+                </div>
                 <Input label="Keywords (comma-separated)" placeholder="e.g. cancer, immunotherapy, clinical trial" />
                 <div className="flex justify-end">
-                  <Button onClick={() => setStep(2)}>Continue <ArrowRight size={16} /></Button>
+                  <Button onClick={() => setStep(2)} disabled={!abstractFile}>Continue <ArrowRight size={16} /></Button>
                 </div>
               </div>
             )}
@@ -131,6 +183,9 @@ export function SubmitPage() {
                     <Badge variant="success">Ready</Badge>
                     <span className="text-sm text-navy-600">Your manuscript information is complete</span>
                   </div>
+                  <p className="text-sm text-navy-500">
+                    Abstract file: <span className="font-medium text-navy-700">{abstractFile?.name}</span>
+                  </p>
                   <p className="text-sm text-navy-500">
                     Please review all information before submitting. You will receive a confirmation
                     email and a unique manuscript reference number.
