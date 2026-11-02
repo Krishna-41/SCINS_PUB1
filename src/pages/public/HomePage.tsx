@@ -88,8 +88,6 @@ export function HomePage() {
 
   if (loading) return <LoadingSpinner label="Loading homepage..." />;
 
-  const hasArticles = articles.length > 0;
-
   return (
     <div className="animate-fade-in">
       {/* Hero */}
@@ -221,8 +219,7 @@ export function HomePage() {
       </section>
 
       {/* Editors-in-Chief */}
-      {editors.length > 0 && (
-        <section className="bg-navy-50 py-16 lg:py-20">
+      <section className="bg-navy-50 py-16 lg:py-20">
           <div className="container-wide">
             <div className="flex items-end justify-between mb-8">
               <div>
@@ -233,6 +230,9 @@ export function HomePage() {
                 View all journals <ArrowRight size={16} />
               </Link>
             </div>
+            {editors.length === 0 ? (
+              <EmptyState title="No editors-in-chief listed yet" description="Editorial leadership appears here once a journal's Editor-in-Chief is added." />
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {editors.map((editor) => (
                 <Card key={editor.id} hover className="h-full">
@@ -264,13 +264,12 @@ export function HomePage() {
                 </Card>
               ))}
             </div>
+            )}
           </div>
-        </section>
-      )}
+      </section>
 
-      {/* Latest Articles */}
-      {hasArticles && (
-        <section className="bg-navy-50 py-16 lg:py-20">
+      {/* Latest Publications */}
+      <section className="bg-navy-50 py-16 lg:py-20">
           <div className="container-wide">
             <div className="flex items-end justify-between mb-8">
               <div>
@@ -281,6 +280,9 @@ export function HomePage() {
                 View all <ArrowRight size={16} />
               </Link>
             </div>
+            {articles.length === 0 ? (
+              <EmptyState title="No publications yet" description="Newly published articles will be listed here." />
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {articles.map((article) => (
                 <Link key={article.id} to={`/articles/${article.slug}`}>
@@ -316,9 +318,9 @@ export function HomePage() {
                 </Link>
               ))}
             </div>
+            )}
           </div>
-        </section>
-      )}
+      </section>
 
       {/* CTA */}
       <section className="py-16 lg:py-20">
