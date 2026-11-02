@@ -16,7 +16,8 @@ export function BooksPage() {
       .from('books')
       .select('*')
       .eq('status', 'published')
-      .order('sort_order, publish_date', { ascending: false })
+      .order('sort_order', { ascending: false })
+      .order('publish_date', { ascending: false })
       .then(({ data }) => {
         setBooks((data as unknown as Book[]) || []);
         setLoading(false);

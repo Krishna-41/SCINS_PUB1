@@ -17,6 +17,8 @@ const footerColumns = [
     links: [
       { label: 'Peer Review Process', to: '/peer-review' },
       { label: 'Index & Abstracting', to: '/indexing' },
+      { label: 'Books & eBooks', to: '/books' },
+      { label: 'Conferences', to: '/conferences' },
       { label: 'Author Guidelines', to: '/pages/author-guidelines' },
       { label: 'Publication Charges', to: '/pages/publication-charges' },
     ],

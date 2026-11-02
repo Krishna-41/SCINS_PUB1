@@ -19,6 +19,12 @@ import { NewsListPage, NewsDetailPage } from '@/pages/public/NewsPage';
 import { CmsPageView } from '@/pages/public/CmsPage';
 import { ContactPage } from '@/pages/public/ContactPage';
 import { SearchPage } from '@/pages/public/SearchPage';
+import { BooksPage } from '@/pages/public/BooksPage';
+import { ConferencesListPage, ConferenceDetailPage } from '@/pages/public/ConferencesPage';
+import {
+  ConferenceRegisterPage,
+  ConferenceSubmitAbstractPage,
+} from '@/pages/public/ConferenceActionsPage';
 import { SubmitPage } from '@/pages/public/SubmitPage';
 import { SitemapPage } from '@/pages/public/SitemapPage';
 import { NotFoundPage } from '@/pages/public/NotFoundPage';
@@ -87,6 +93,11 @@ function App() {
             <Route path="/peer-review" element={<Public variant="peer-review"><PeerReviewPage /></Public>} />
             <Route path="/news" element={<Public><NewsListPage /></Public>} />
             <Route path="/news/:slug" element={<Public><NewsDetailPage /></Public>} />
+            <Route path="/books" element={<Public><BooksPage /></Public>} />
+            <Route path="/conferences" element={<Public><ConferencesListPage /></Public>} />
+            <Route path="/conferences/:slug" element={<Public><ConferenceDetailPage /></Public>} />
+            <Route path="/conferences/:slug/register" element={<Public><ConferenceRegisterPage /></Public>} />
+            <Route path="/conferences/:slug/submit" element={<Public><ConferenceSubmitAbstractPage /></Public>} />
             <Route path="/pages/:slug" element={<Public><CmsPageView /></Public>} />
             <Route path="/contact" element={<Public><ContactPage /></Public>} />
             <Route path="/search" element={<Public><SearchPage /></Public>} />
